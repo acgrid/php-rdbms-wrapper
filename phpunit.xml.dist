@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    testsuite="RDB"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    backupGlobals="false"
+>
+    <testsuites>
+        <testsuite name="RDB">
+            <directory>tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <var name="DB_DSN" value="mysql:host=127.0.0.1;dbname=test" />
+        <var name="DB_HOST" value="127.0.0.1" />
+        <var name="DB_USER" value="root" />
+        <var name="DB_PASS" value="" />
+        <var name="DB_NAME" value="test" />
+    </php>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src/</directory>
+            <exclude>
+                <directory suffix=".php">tests/</directory>
+                <directory suffix=".php">vendor/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+</phpunit>

@@ -1,0 +1,27 @@
+{
+  "name": "acgrid/rdb-helper",
+  "type": "library",
+  "keyword": ["RDBMS", "wrapper", "facade"],
+  "description": "Deal with differences within PHP RDBMS APIs. Also provide facade class for global access. It does not try to generalize or simplify writing SQL.",
+  "author": [
+    {"name": "acgrid", "email": "acgrid@gmail.com", "homepage": "http://github.com/acgrid"}
+  ],
+  "require": {
+    "php": "~5.6|~7.0",
+    "acgrid/phprofiling": "@stable"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~5"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "RDB\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RDBTest\\": "tests/"
+    }
+  }
+}
