@@ -11,7 +11,8 @@
     "acgrid/phprofiling": "@stable"
   },
   "require-dev": {
-    "phpunit/phpunit": "~5"
+    "phpunit/phpunit": "~5",
+    "phpunit/dbunit": "^2.0"
   },
   "license": "MIT",
   "autoload": {
