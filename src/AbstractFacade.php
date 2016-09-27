@@ -221,6 +221,11 @@ abstract class AbstractFacade
         return static::getInstance()->query($query, ...$args)->fetchNum();
     }
 
+    public static function queryObject($query, $className, $constructorParam, ...$args)
+    {
+        return static::getInstance()->query($query, ...$args)->fetchObject($className, $constructorParam);
+    }
+
     /**
      * Return all result rows in associative array of a query
      * Do not use me on huge result for better memory performance,
@@ -269,16 +274,35 @@ abstract class AbstractFacade
      * because Generator objects are always evaluated to be true.
      * @param string $query
      * @param array ...$args
-     * @return array|\Generator
+     * @return \Traversable|array
      */
     public static function iterate($query, ...$args)
     {
         $self = static::getInstance();
         if($self->lastResultCount = $self->query($query, ...$args)->fetchCount()){
             return $self->db->fetchGenerator();
-        }else{
-            return [];
         }
+        return [];
+    }
+
+
+    /**
+     * Get a Generator object that can be iterated by `foreach`.
+     * Return [] in case of empty result, giving client code a chance of judgement before iteration
+     * because Generator objects are always evaluated to be true.
+     * @param string $query
+     * @param string $className
+     * @param array $constructors
+     * @param array ...$args
+     * @return \Traversable|array
+     */
+    public static function iterateObject($query, $className, $constructors, ...$args)
+    {
+        $self = static::getInstance();
+        if($self->lastResultCount = $self->query($query, ...$args)->fetchCount()){
+            return $self->db->fetchObjectGenerator($className, $constructors);
+        }
+        return [];
     }
 
     /**

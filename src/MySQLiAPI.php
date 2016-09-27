@@ -56,6 +56,11 @@ class MySQLiAPI implements IDB_API
         if(isset($config[self::DSN_CHARSET])) $this->charset = $config[self::DSN_CHARSET];
     }
 
+    protected function nullGenerator()
+    {
+        yield;
+    }
+
     /**
      * @inheritDoc
      */
@@ -183,7 +188,7 @@ class MySQLiAPI implements IDB_API
      */
     public function fetchGenerator()
     {
-        static $generator, $null_generator;
+        static $generator;
         if($this->result instanceof mysqli_result){
             if(!isset($generator)) $generator = function(mysqli_result $result){
                 while($row = $result->fetch_assoc()) yield $row;
@@ -193,10 +198,28 @@ class MySQLiAPI implements IDB_API
             unset($this->result);
             return $generator($result);
         }else{
-            if(!isset($null_generator)) $null_generator = function(){
-                yield;
+            return $this->nullGenerator();
+        }
+    }
+
+    public function fetchObject($className = '\stdClass', array $params = [])
+    {
+        return isset($this->result) ? $this->result->fetch_object($className, $params) : null;
+    }
+
+    public function fetchObjectGenerator($className = '\stdClass', $params = [])
+    {
+        static $generator;
+        if($this->result instanceof mysqli_result){
+            if(!isset($generator)) $generator = function(mysqli_result $result, $className, $params){
+                while($object = $result->fetch_object($className, $params)) yield $object;
+                $result->free();
             };
-            return $null_generator();
+            $result = $this->result;
+            unset($this->result);
+            return $generator($result, $className, $params);
+        }else{
+            return $this->nullGenerator();
         }
     }
 

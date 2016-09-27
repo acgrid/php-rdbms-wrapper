@@ -41,20 +41,45 @@ class FacadeTest extends AbstractTest
         $this->assertEquals(1, MainDB::latestCount());
         $this->assertEquals(0, MainDB::exists('SELECT * FROM `test` WHERE `id` = 999'));
         $this->assertEmpty(MainDB::iterate('SELECT * FROM `test` WHERE `id` = 999'));
-        if($rows = MainDB::iterate('SELECT `name`, `amount` FROM `test` WHERE `amount` > 0')){
+        if($objects = MainDB::iterate('SELECT `name`, `amount` FROM `test` WHERE `amount` > 0')){
             $this->assertEquals(2, MainDB::latestCount());
-            $rows2 = MainDB::iterate('SELECT `name`, `amount` FROM `test` WHERE `amount` = 0');
+            $objects2 = MainDB::iterate('SELECT `name`, `amount` FROM `test` WHERE `amount` = 0');
             $iteration = 0;
-            foreach($rows2 as $row2){
+            foreach($objects2 as $object2){
                 $iteration++;
-                $this->assertEquals(0, $row2['amount']);
+                $this->assertEquals(0, $object2['amount']);
             }
             $this->assertEquals(1, $iteration);
-            foreach($rows as $row){
+            foreach($objects as $object){
                 $iteration++;
-                $this->assertArrayHasKey('name', $row);
-                $this->assertArrayHasKey('amount', $row);
-                $this->assertGreaterThan(0, $row['amount']);
+                $this->assertArrayHasKey('name', $object);
+                $this->assertArrayHasKey('amount', $object);
+                $this->assertGreaterThan(0, $object['amount']);
+            }
+            $this->assertEquals(3, $iteration);
+        }else{
+            $this->fail('Iterator should return object that evaluated to be true.');
+        }
+        $this->assertEmpty(MainDB::iterateObject('SELECT * FROM `test` WHERE `id` = 999', SampleDomain::class, []));
+        if($objects = MainDB::iterateObject('SELECT * FROM `test` WHERE `amount` > 0', SampleDomain::class, [5])){
+            $this->assertEquals(2, MainDB::latestCount());
+            $objects2 = MainDB::iterateObject('SELECT * FROM `test` WHERE `amount` = 0', SampleDomain::class, [10, false]);
+            $iteration = 0;
+            foreach($objects2 as $object2){
+                $iteration++;
+                /** @var SampleDomain $object2 */
+                $this->assertInstanceOf(SampleDomain::class, $object2);
+                $this->assertSame(10, $object2->getId());
+                $this->assertEquals(0, $object2->getAmount());
+                $this->assertFalse($object2->isEnabled());
+            }
+            $this->assertEquals(1, $iteration);
+            foreach($objects as $object){
+                /** @var SampleDomain $object */
+                $iteration++;
+                $this->assertSame(5, $object->getId());
+                $this->assertTrue($object->isEnabled());
+                $this->assertGreaterThan(0, $object->getAmount());
             }
             $this->assertEquals(3, $iteration);
         }else{

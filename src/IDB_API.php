@@ -99,6 +99,14 @@ interface IDB_API
     public function fetch();
 
     /**
+     * Get next row in constructing specific object of internal result
+     * @param string $className
+     * @param array $params
+     * @return mixed
+     */
+    public function fetchObject($className = '\stdClass', array $params = []);
+
+    /**
      * Get next row in number-indexed array of internal result
      * @return array
      */
@@ -121,6 +129,14 @@ interface IDB_API
      * @return \Generator
      */
     public function fetchGenerator();
+
+    /**
+     * Get a generator of every row in object of internal result
+     * @param string $className
+     * @param array $params
+     * @return mixed
+     */
+    public function fetchObjectGenerator($className = '\stdClass', $params = []);
 
     /**
      * Create a prepared statement that wrapped by a object implements IStatement
