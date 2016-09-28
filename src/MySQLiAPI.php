@@ -202,22 +202,30 @@ class MySQLiAPI implements IDB_API
         }
     }
 
-    public function fetchObject($className = '\stdClass', array $params = [])
+    protected function objectFactory($className, $params)
     {
-        return isset($this->result) ? $this->result->fetch_object($className, $params) : null;
+        $factory = [$className];
+        if(isset($params)) $factory[] = $params;
+        return $factory;
     }
 
-    public function fetchObjectGenerator($className = '\stdClass', $params = [])
+    public function fetchObject($className = '\stdClass', array $params = null)
+    {
+        $factory = $this->objectFactory($className, $params);
+        return isset($this->result) ? $this->result->fetch_object(...$factory) : null;
+    }
+
+    public function fetchObjectGenerator($className = '\stdClass', array $params = null)
     {
         static $generator;
         if($this->result instanceof mysqli_result){
-            if(!isset($generator)) $generator = function(mysqli_result $result, $className, $params){
-                while($object = $result->fetch_object($className, $params)) yield $object;
+            if(!isset($generator)) $generator = function(mysqli_result $result, array $factory){
+                while($object = $result->fetch_object(...$factory)) yield $object;
                 $result->free();
             };
             $result = $this->result;
             unset($this->result);
-            return $generator($result, $className, $params);
+            return $generator($result, $this->objectFactory($className, $params));
         }else{
             return $this->nullGenerator();
         }

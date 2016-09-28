@@ -67,6 +67,11 @@ class MySQLiTest extends AbstractTest
             (new \PHPUnit_Extensions_Database_DataSet_ArrayDataSet(['test' => $this->table]))->getTable('test'),
             $this->getConnection()->createQueryTable('test', 'SELECT * FROM `test`')
         );
+        $this->assertInstanceOf(MostSampleDomain::class, $object0 = $this->api->query('SELECT * FROM `test` WHERE `id` = 1')->fetchObject(MostSampleDomain::class, null));
+        /** @var MostSampleDomain $object0 */
+        $this->assertEquals(1, $object0->getId());
+        $this->assertSame('A', $object0->getName());
+        $this->assertEquals(1553.1, $object0->getAmount());
         $this->assertInstanceOf(SampleDomain::class, $object = $this->api->query('SELECT * FROM `test` WHERE `id` = 2')->fetchObject(SampleDomain::class, [9, false]));
         /** @var SampleDomain $object */
         $this->assertSame(9, $object->getId());
