@@ -35,7 +35,7 @@ class MySQLiStatement implements IStatement
      */
     public function native()
     {
-        return $this->stmt;
+        return isset($this->stmt) ? $this->stmt : null;
     }
 
     /**

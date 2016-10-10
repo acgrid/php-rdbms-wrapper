@@ -132,6 +132,7 @@ class FacadeTest extends AbstractTest
         $stmt2->execute();
         $stmt1->close();
         $stmt2->close();
+        $this->assertNull($stmt2->native());
         $this->assertTablesEqual(
             (new \PHPUnit_Extensions_Database_DataSet_ArrayDataSet(['test' => $this->table]))->getTable('test'),
             $this->getConnection()->createQueryTable('test', 'SELECT * FROM `test`')
