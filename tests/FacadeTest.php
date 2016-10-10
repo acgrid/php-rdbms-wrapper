@@ -124,6 +124,12 @@ class FacadeTest extends AbstractTest
         $id = $stmt1->bindIn($name, $description)->execute();
         $this->assertGreaterThan(0, $id);
         $stmt2->bindIn($id)->execute();
+        $name = 'M';
+        $description = 'foo';
+        $id = $stmt1->execute();
+        $this->assertSame($name, MainDB::queryValue('SELECT `name` FROM `test` WHERE `id` = %u', $id));
+        $this->assertSame($description, MainDB::queryValue('SELECT `description` FROM `test` WHERE `id` = %u', $id));
+        $stmt2->execute();
         $stmt1->close();
         $stmt2->close();
         $this->assertTablesEqual(
