@@ -108,13 +108,18 @@ class FacadeTest extends AbstractTest
         $this->assertEquals(12, MainDB::tableSum('test', 'quantity'));
         $description = 'wtf';
         $amount = 4.5;
-        $stmt = MainDB::prepare('INSERT INTO %s (name, quantity, description, amount) VALUES (?, 0, ?, ?)', 'test')->bindIn($name, $description, $amount);
+        $stmt = MainDB::prepare('INSERT INTO `%s` (name, quantity, description, amount) VALUES (?, 0, ?, ?)', 'test')->bindIn($name, $description, $amount);
         $id = count($this->table);
         foreach(['E', 'F'] as $index => $name){
             $this->assertEquals(++$id, $stmt->execute());
             $this->table[] = ['id' => $id, 'name' => $name, 'quantity' => 0, 'description' => $description, 'amount' => $amount];
         }
+        $this->assertSame($stmt, $stmt2 = MainDB::prepare('INSERT INTO `test` (name, quantity, description, amount) VALUES (?, 0, ?, ?)'));
         $stmt->close();
+        $this->assertEmpty($stmt2->native());
+        $stmt3 = MainDB::prepare('UPDATE test SET quantity = 0');
+        MainDB::clearStmtCache();
+        $this->assertNotSame($stmt3, MainDB::prepare('UPDATE test SET quantity = 0'));
         $this->assertTablesEqual(
             (new \PHPUnit_Extensions_Database_DataSet_ArrayDataSet(['test' => $this->table]))->getTable('test'),
             $this->getConnection()->createQueryTable('test', 'SELECT * FROM `test`')
