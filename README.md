@@ -14,7 +14,6 @@ This wrapper is try to separate client code with ALL driver-specific calls witho
 * Generated documents
 * PDO implementation
 * Does not work on HHVM due to both variadic and by reference arguments are not supported
-* Non static facades
 
 ## License
 MIT
