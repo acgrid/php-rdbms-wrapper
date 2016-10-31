@@ -10,6 +10,7 @@ namespace RDBTest;
 use PHProfiling\Manager;
 use PHPUnit_Extensions_Database_DataSet_ArrayDataSet;
 use RDB\AbstractFacade;
+use RDB\DBInstance;
 use RDB\MySQLiAPI;
 
 
@@ -23,6 +24,7 @@ class FacadeTest extends AbstractTest
     public function testQuery()
     {
         $this->assertInstanceOf(MySQLiAPI::class, MainDB::getAPI());
+        $this->assertInstanceOf(Manager::class, MainDB::getProfiler());
         $this->assertInstanceOf('\mysqli', MainDB::getConnection());
         $this->assertEquals(3, MainDB::exec("INSERT INTO `test` (name, quantity, amount) VALUES (%s, %u, %.2f)", MainDB::esc('C'), 2, 2.33));
         $this->assertEquals(2, MainDB::exec('UPDATE `test` SET `description` = %s WHERE `description` IS NULL', MainDB::esc('Filled')));
@@ -60,6 +62,13 @@ class FacadeTest extends AbstractTest
         }else{
             $this->fail('Iterator should return object that evaluated to be true.');
         }
+        $row = MainDB::queryIndexedRow('SELECT `name`, `description` FROM `test` WHERE `id` = 2');
+        $this->assertSame('B', $row[0]);
+        $this->assertSame('Bad', $row[1]);
+        /** @var SampleDomain $object */
+        $object = MainDB::queryObject('SELECT * FROM `test` WHERE `id` = 1', SampleDomain::class, [1]);
+        $this->assertInstanceOf(SampleDomain::class, $object);
+        $this->assertEquals(10, $object->getQuantity());
         $this->assertEmpty(MainDB::iterateObject('SELECT * FROM `test` WHERE `id` = 999', SampleDomain::class, []));
         if($objects = MainDB::iterateObject('SELECT * FROM `test` WHERE `amount` > 0', SampleDomain::class, [5])){
             $this->assertEquals(2, MainDB::latestCount());
@@ -160,12 +169,12 @@ class MainDB extends AbstractFacade
 
     public static function getInstance()
     {
-        if(!isset(static::$instance)) static::factory(new MySQLiAPI([
+        if(!isset(static::$instance)) static::factory(new DBInstance(new MySQLiAPI([
             MySQLiAPI::DSN_HOST => $GLOBALS['DB_HOST'],
             MySQLiAPI::DSN_USER => $GLOBALS['DB_USER'],
             MySQLiAPI::DSN_PASS => $GLOBALS['DB_PASS'],
             MySQLiAPI::DSN_NAME => $GLOBALS['DB_NAME'],
-        ]), new Manager());
+        ]), new Manager()));
         return static::$instance;
     }
 
@@ -177,12 +186,12 @@ class ArchiveDB extends AbstractFacade
 
     public static function getInstance()
     {
-        if(!isset(static::$instance)) static::factory(new MySQLiAPI([
+        if(!isset(static::$instance)) static::factory(new DBInstance(new MySQLiAPI([
             MySQLiAPI::DSN_HOST => $GLOBALS['DB_HOST'],
             MySQLiAPI::DSN_USER => $GLOBALS['DB_USER'],
             MySQLiAPI::DSN_PASS => $GLOBALS['DB_PASS'],
             MySQLiAPI::DSN_NAME => $GLOBALS['DB_NAME'],
-        ]), new Manager());
+        ]), new Manager()));
         return static::$instance;
     }
 }
