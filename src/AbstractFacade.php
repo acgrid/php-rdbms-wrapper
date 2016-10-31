@@ -42,6 +42,7 @@ use PHProfiling\Manager;
  * @method static bool batch(callable $callback, $query, ...$args)
  * @method static int latestCount()
  * @method static IStatement prepare($query, ...$args)
+ * @method static void clearStmtCache()
  * @method static string tableValue($table, $field, $suffix = '')
  * @method static int tableCount($table, $suffix = '', $field = '*')
  * @method static int|float tableSum($table, $suffix = '', $field = '*')

@@ -30,8 +30,8 @@ class DBInstance
 {
     /** @var IDB_API */
     protected $db;
-    /** @var IStatement */
-    protected $stmt;
+    /** @var array */
+    protected $stmt = [];
     /** @var Manager */
     protected $profiler;
     /** @var int */
@@ -318,7 +318,8 @@ class DBInstance
     // Prepared query methods
 
     /**
-     * Get a prepared statement wrapper from current connection
+     * Get a prepared statement wrapper from current connection for the same query
+     * It will check for native stmt object before returning it
      * @see IStatement
      * @param string $query
      * @param array ...$args
@@ -326,15 +327,30 @@ class DBInstance
      */
     public function prepare($query, ...$args)
     {
-        $self = $this;
         if(count($args)) $query = vsprintf($query, $args);
-        $self->profiler->namedStart("[Prepared] $query");
-        try{
-            $stmt = $self->db->prepare($query);
-        }finally{
-            $self->profiler->stop();
+        if(isset($this->stmt[$query])){
+            /** @var IStatement $stmt */
+            $stmt = $this->stmt[$query];
+            if($stmt->native()) return $stmt;
         }
-        return $stmt;
+        $this->profiler->namedStart("[Prepared] $query");
+        try{
+            return $this->stmt[$query] = $this->db->prepare($query);
+        }finally{
+            $this->profiler->stop();
+        }
+    }
+
+    /**
+     * Close all cached prepared statements
+     */
+    public function clearStmtCache()
+    {
+        foreach($this->stmt as $stmt){
+            /** @var IStatement $stmt */
+            $stmt->close();
+        }
+        $this->stmt = [];
     }
 
     // Shorthand Methods
