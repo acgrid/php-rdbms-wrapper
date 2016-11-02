@@ -102,8 +102,8 @@ class FacadeTest extends AbstractTest
             (new \PHPUnit_Extensions_Database_DataSet_ArrayDataSet(['test' => $this->table]))->getTable('test'),
             $this->getConnection()->createQueryTable('test', 'SELECT * FROM `test`')
         );
-        $this->assertEquals(2, MainDB::tableCount('test', 'WHERE `quantity` > 0'));
-        $this->assertEquals('C', MainDB::tableValue('test', 'name', 'WHERE `id` = 3'));
+        $this->assertSame(2, MainDB::tableCount('test', 'WHERE `quantity` > 0'));
+        $this->assertSame('C', MainDB::tableValue('test', 'name', 'WHERE `id` = 3'));
         $this->assertNull(MainDB::tableValue('test', 'name', 'WHERE `id` = 999'));
         $this->assertEquals(12, MainDB::tableSum('test', 'quantity'));
         $description = 'wtf';

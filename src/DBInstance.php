@@ -376,7 +376,7 @@ class DBInstance
      */
     public function tableCount($table, $suffix = '', $field = '*')
     {
-        return self::queryValue('SELECT COUNT(%s) FROM %s %s', $field, $table, $suffix) ?: 0;
+        return ($count = self::queryValue('SELECT COUNT(%s) FROM %s %s', $field, $table, $suffix)) ? intval($count) : 0;
     }
 
     /**
@@ -388,7 +388,7 @@ class DBInstance
      */
     public function tableSum($table, $field, $suffix = '')
     {
-        return self::queryValue('SELECT SUM(%s) FROM `%s`%s', $field, $table, $suffix) ?: 0;
+        return ($sum = self::queryValue('SELECT SUM(%s) FROM `%s`%s', $field, $table, $suffix)) ? floatval($sum) : 0;
     }
     
 }
