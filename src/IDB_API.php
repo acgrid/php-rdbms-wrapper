@@ -101,6 +101,12 @@ interface IDB_API
     public function fetchCount();
 
     /**
+     * Clear internal result set
+     * @return $this
+     */
+    public function clear();
+
+    /**
      * Get next row in associative array of internal result
      * @return array
      */

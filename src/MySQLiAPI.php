@@ -114,6 +114,15 @@ class MySQLiAPI implements IDB_API
     }
 
     /**
+     * @return $this
+     */
+    public function clear()
+    {
+        unset($this->result);
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function query($query)

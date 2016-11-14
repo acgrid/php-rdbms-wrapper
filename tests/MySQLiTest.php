@@ -49,6 +49,8 @@ class MySQLiTest extends AbstractTest
         $this->assertInstanceOf('\mysqli_result', $this->api->rawResult());
         $this->assertEquals(3, $this->api->fetchCount());
         $this->assertEquals(['name' => 'C', 'description' => 'Silent is gold'], $this->api->fetch());
+        $this->assertSame($this->api, $this->api->clear());
+        $this->assertEmpty($this->api->fetch());
         $this->assertCount(3, $this->api->query('SELECT `name`, `description` FROM `test`')->fetchAll());
         $this->assertSame([0 => 'B', 1 => 'Bad'], $this->api->query('SELECT `name`, `description` FROM `test` WHERE `id` = 2')->fetchNum());
         $result = $this->api->query('SELECT `name`, `amount` FROM `test` WHERE `amount` > 0')->fetchGenerator();
