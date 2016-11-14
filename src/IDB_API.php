@@ -17,6 +17,14 @@ namespace RDB;
  */
 interface IDB_API
 {
+    const DSN_HOST = 'host';
+    const DSN_USER = 'user';
+    const DSN_PASS = 'pw';
+    const DSN_NAME = 'name';
+    const DSN_PORT = 'port';
+    const DSN_SOCKET = 'socket';
+    const DSN_CHARSET = 'charset';
+
     /**
      * Test whether the connection is established already and ready to use
      * @return bool
@@ -125,8 +133,8 @@ interface IDB_API
     public function fetchAll();
 
     /**
-     * Get a generator of every row in associative array of internal result
-     * @return \Generator
+     * Get a traversable stuff of every row in associative array of internal result
+     * @return \Traversable
      */
     public function fetchGenerator();
 
@@ -134,7 +142,7 @@ interface IDB_API
      * Get a generator of every row in object of internal result
      * @param string $className
      * @param array $params
-     * @return mixed
+     * @return \Traversable
      */
     public function fetchObjectGenerator($className = '\stdClass', array $params = null);
 

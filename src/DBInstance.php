@@ -244,9 +244,8 @@ class DBInstance
      */
     public function iterate($query, ...$args)
     {
-        $self = $this;
-        if($self->lastResultCount = $self->query($query, ...$args)->fetchCount()){
-            return $self->db->fetchGenerator();
+        if($this->lastResultCount = $this->query($query, ...$args)->fetchCount()){
+            return $this->db->fetchGenerator();
         }
         return [];
     }

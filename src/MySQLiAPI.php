@@ -19,13 +19,6 @@ use \mysqli_result;
  */
 class MySQLiAPI implements IDB_API
 {
-    const DSN_HOST = 'host';
-    const DSN_USER = 'user';
-    const DSN_PASS = 'pw';
-    const DSN_NAME = 'name';
-    const DSN_PORT = 'port';
-    const DSN_SOCKET = 'socket';
-    const DSN_CHARSET = 'charset';
     const DSN_REPORT = 'report';
 
     protected $dsn = [];
@@ -49,16 +42,12 @@ class MySQLiAPI implements IDB_API
      */
     public function __construct(array $config = [])
     {
+        if(!is_a(mysqli_result::class, \Traversable::class, true)) throw new \RuntimeException('mysqli_result does not implement Traversable, is PHP >= 5.3');
         foreach([self::DSN_HOST, self::DSN_USER, self::DSN_PASS, self::DSN_NAME, self::DSN_PORT, self::DSN_SOCKET] as $key){
             $this->dsn[] = isset($config[$key]) ? $config[$key] : ini_get("mysqli.default_$key");
         }
         if(isset($config[self::DSN_REPORT])) $this->report = $config[self::DSN_REPORT];
         if(isset($config[self::DSN_CHARSET])) $this->charset = $config[self::DSN_CHARSET];
-    }
-
-    protected function nullGenerator()
-    {
-        yield;
     }
 
     /**
@@ -185,21 +174,16 @@ class MySQLiAPI implements IDB_API
 
     /**
      * @inheritDoc
+     * @since PHP 5.3
      */
     public function fetchGenerator()
     {
-        static $generator;
-        if($this->result instanceof mysqli_result){
-            if(!isset($generator)) $generator = function(mysqli_result $result){
-                while($row = $result->fetch_assoc()) yield $row;
-                $result->free();
-            };
+        if(isset($this->result)){
             $result = $this->result;
             unset($this->result);
-            return $generator($result);
-        }else{
-            return $this->nullGenerator();
+            return $result;
         }
+        return [];
     }
 
     protected function objectFactory($className, $params)
@@ -227,7 +211,7 @@ class MySQLiAPI implements IDB_API
             unset($this->result);
             return $generator($result, $this->objectFactory($className, $params));
         }else{
-            return $this->nullGenerator();
+            return [];
         }
     }
 

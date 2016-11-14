@@ -35,6 +35,8 @@ class MySQLiTest extends AbstractTest
 
     public function testSimpleQuery()
     {
+        $this->assertEmpty($this->api->fetchGenerator());
+        $this->assertEmpty($this->api->fetchObjectGenerator());
         $this->assertInstanceOf('\mysqli', $this->api->getConnection());
         $this->assertEquals(2, $this->getConnection()->getRowCount('test'));
         $this->assertTrue($this->api->isConnected());
@@ -50,13 +52,14 @@ class MySQLiTest extends AbstractTest
         $this->assertCount(3, $this->api->query('SELECT `name`, `description` FROM `test`')->fetchAll());
         $this->assertSame([0 => 'B', 1 => 'Bad'], $this->api->query('SELECT `name`, `description` FROM `test` WHERE `id` = 2')->fetchNum());
         $result = $this->api->query('SELECT `name`, `amount` FROM `test` WHERE `amount` > 0')->fetchGenerator();
-        $this->assertInstanceOf('\Generator', $result);
+        $this->assertInstanceOf(\Traversable::class, $result);
+        $this->assertEmpty($this->api->fetchGenerator());
         foreach($result as $item){
             $this->assertArrayHasKey('name', $item);
             $this->assertArrayHasKey('amount', $item);
             $this->assertGreaterThan(0, $item['amount']);
         }
-        $this->assertInstanceOf('\Generator', $this->api->query('SELECT `name` FROM `test` WHERE `id` = 999')->fetchGenerator());
+        $this->assertInstanceOf(\Traversable::class, $this->api->query('SELECT `name` FROM `test` WHERE `id` = 999')->fetchGenerator());
         $this->api->queryExclusiveCallback('SELECT `id`, `quantity` FROM `test` WHERE `quantity` = 0', function($mysqli){
             $this->assertInstanceOf(MySQLiAPI::class, $mysqli);
         }, function($row){
@@ -68,6 +71,7 @@ class MySQLiTest extends AbstractTest
             $this->getConnection()->createQueryTable('test', 'SELECT * FROM `test`')
         );
         $this->assertInstanceOf(MostSampleDomain::class, $object0 = $this->api->query('SELECT * FROM `test` WHERE `id` = 1')->fetchObject(MostSampleDomain::class, null));
+        $this->assertEmpty($this->api->fetchObject());
         /** @var MostSampleDomain $object0 */
         $this->assertEquals(1, $object0->getId());
         $this->assertSame('A', $object0->getName());
@@ -142,8 +146,18 @@ class MySQLiTest extends AbstractTest
      */
     public function testException()
     {
-        $this->setExpectedException('\mysqli_sql_exception');
-        $this->api->exec('DO EVIL');
+        try{
+            (new MySQLiAPI())->getConnection();
+            $this->fail('Should connect exception');
+        }catch(\RuntimeException $e){
+
+        }
+        try{
+            $this->api->exec('DO EVIL');
+            $this->fail('Should SQL Exception');
+        }catch(\mysqli_sql_exception $e){
+
+        }
     }
 
     /**
