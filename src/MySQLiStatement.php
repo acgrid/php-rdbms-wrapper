@@ -51,7 +51,7 @@ class MySQLiStatement implements IStatement
             }elseif(is_float($bind)){
                 $types .= 'd';
             }else{
-                $types .= strlen($bind) > 1048576 ? 'b' : 's';
+                $types .= 's';
             }
         }
         return $this->stmt->bind_param($types, ...$binds) ? $this : false;
