@@ -23,7 +23,7 @@ class MySQLiAPI implements IDB_API
 
     protected $dsn = [];
     protected $report = \MYSQLI_REPORT_STRICT | \MYSQLI_REPORT_ERROR;
-    protected $charset = 'utf8';
+    protected $charset = 'utf8mb4';
     /** @var mysqli */
     protected $connection;
     /** @var mysqli_result */
