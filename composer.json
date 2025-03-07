@@ -1,5 +1,5 @@
 {
-  "name": "bgli100/rdb-helper",
+  "name": "acgrid/rdb-helper",
   "type": "library",
   "keyword": ["RDBMS", "wrapper", "facade"],
   "description": "Deal with differences within PHP RDBMS APIs. Also provide facade class for global access. It does not try to generalize or simplify writing SQL.",
