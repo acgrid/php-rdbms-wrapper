@@ -202,13 +202,13 @@ class MySQLiAPI implements IDB_API
         return $factory;
     }
 
-    public function fetchObject($className = '\stdClass', array $params = null)
+    public function fetchObject($className = '\stdClass', array|null $params)
     {
         $factory = $this->objectFactory($className, $params);
         return isset($this->result) ? $this->result->fetch_object(...$factory) : null;
     }
 
-    public function fetchObjectGenerator($className = '\stdClass', array $params = null)
+    public function fetchObjectGenerator($className = '\stdClass', array|null $params)
     {
         static $generator;
         if($this->result instanceof mysqli_result){

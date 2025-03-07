@@ -118,7 +118,7 @@ interface IDB_API
      * @param array $params
      * @return mixed
      */
-    public function fetchObject($className = '\stdClass', array $params = null);
+    public function fetchObject($className = '\stdClass', array|null $params);
 
     /**
      * Get next row in number-indexed array of internal result
@@ -150,7 +150,7 @@ interface IDB_API
      * @param array $params
      * @return \Traversable
      */
-    public function fetchObjectGenerator($className = '\stdClass', array $params = null);
+    public function fetchObjectGenerator($className = '\stdClass', array|null $params);
 
     /**
      * Create a prepared statement that wrapped by a object implements IStatement
